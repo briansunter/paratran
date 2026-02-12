@@ -83,17 +83,24 @@ paratran serve
 paratran serve --host 127.0.0.1 --port 9000 --cache-dir /path/to/models
 ```
 
-### Transcribe via API
+### Endpoints
+
+**`GET /health`** — Returns model name, status, and cache directory.
+
+**`POST /transcribe`** — Upload audio file, returns transcription JSON.
 
 ```bash
+# Basic transcription
 curl -X POST http://localhost:8000/transcribe -F "file=@recording.m4a"
-```
 
-### Extract just text
+# With beam search and sentence splitting
+curl -X POST "http://localhost:8000/transcribe?decoding=beam&max_words=20" -F "file=@recording.m4a"
 
-```bash
+# Extract just text
 curl -s -X POST http://localhost:8000/transcribe -F "file=@audio.m4a" | jq -r '.text'
 ```
+
+Query parameters: `decoding`, `beam_size`, `length_penalty`, `patience`, `duration_reward`, `max_words`, `silence_gap`, `max_duration`, `chunk_duration`, `overlap_duration`, `fp32`.
 
 ### Response format
 
@@ -120,7 +127,11 @@ Interactive API docs at `http://localhost:8000/docs`.
 
 ## MCP Server
 
-For Claude Code, add to `.claude/settings.json`:
+Paratran includes an MCP server so Claude Code, Claude Desktop, or any MCP client can transcribe audio files directly.
+
+### Claude Code
+
+Add to `.claude/settings.json`:
 
 ```json
 {
@@ -133,4 +144,27 @@ For Claude Code, add to `.claude/settings.json`:
 }
 ```
 
-The MCP `transcribe` tool accepts a file path and all transcription options (decoding, beam search, sentence splitting, chunking, precision).
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "paratran": {
+      "command": "uvx",
+      "args": ["--from", "paratran", "paratran-mcp"]
+    }
+  }
+}
+```
+
+Optionally set `PARATRAN_MODEL_DIR` in the `env` block to customize the model cache location.
+
+### MCP Tool
+
+The `transcribe` tool accepts:
+- `file_path` (required) — absolute path to audio file
+- All transcription options: `decoding`, `beam_size`, `length_penalty`, `patience`, `duration_reward`, `max_words`, `silence_gap`, `max_duration`, `chunk_duration`, `overlap_duration`, `fp32`
+
+Returns JSON string with full text, duration, processing time, and sentences with word-level timestamps.
