@@ -56,10 +56,30 @@ paratran --decoding beam recording.wav
 paratran --model mlx-community/parakeet-tdt-1.1b-v2 --cache-dir /path/to/models recording.wav
 ```
 
+### Client Mode
+
+Use `--server` / `-s` to send files to a running server instead of transcribing locally. Avoids model loading on every call.
+
+```bash
+# Start server once
+paratran serve
+
+# Transcribe via server (instant, no model loading)
+paratran -s http://localhost:8000 recording.wav
+
+# All options work in client mode
+paratran -s http://localhost:8000 --output-format all --output-dir ./output -v recording.wav
+
+# Or set via environment variable
+export PARATRAN_SERVER=http://localhost:8000
+paratran recording.wav
+```
+
 ### CLI Options
 
 | Flag | Default | Description |
 |------|---------|-------------|
+| `-s`, `--server` | | URL of a running paratran server |
 | `--model` | `mlx-community/parakeet-tdt-0.6b-v3` | HF model ID or local path |
 | `--cache-dir` | HuggingFace default | Model cache directory |
 | `--output-dir` | `.` | Output directory |
@@ -71,7 +91,7 @@ paratran --model mlx-community/parakeet-tdt-1.1b-v2 --cache-dir /path/to/models 
 | `--fp32` | | Use FP32 precision instead of BF16 |
 | `-v` | | Verbose output |
 
-Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`.
+Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`, `PARATRAN_SERVER`.
 
 ## REST API Server
 
