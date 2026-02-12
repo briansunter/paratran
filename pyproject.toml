@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paratran"
-version = "0.2.0"
+version = "0.2.1"
 description = "REST API for audio transcription using parakeet-mlx"
 readme = "README.md"
 license = "MIT"
