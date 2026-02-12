@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/briansunter/paratran/compare/v0.2.1...v0.3.0) (2026-02-12)
+
+
+### Features
+
+* add MCP server for Claude Code and Claude Desktop ([b440260](https://github.com/briansunter/paratran/commit/b440260e09165fa3a7de8c66925ea8f16176c411))
+
 ## [0.2.1](https://github.com/briansunter/paratran/compare/v0.2.0...v0.2.1) (2026-02-12)
 
 
