@@ -29,5 +29,8 @@ dependencies = [
 Homepage = "https://github.com/briansunter/paratran"
 Repository = "https://github.com/briansunter/paratran"
 
+[tool.setuptools.packages.find]
+include = ["paratran*"]
+
 [project.scripts]
 paratran = "paratran.cli:main"
