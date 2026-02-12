@@ -1,36 +1,24 @@
-import os
 import tempfile
-import time
 from pathlib import Path
 from typing import Optional
 
-import mlx.core as mx
-import parakeet_mlx
 from fastapi import FastAPI, File, Query, UploadFile
 from fastapi.responses import JSONResponse
-from parakeet_mlx import Beam, DecodingConfig, Greedy, SentenceConfig
 
-DEFAULT_MODEL = "mlx-community/parakeet-tdt-0.6b-v3"
-MODEL_NAME = os.environ.get("PARATRAN_MODEL", DEFAULT_MODEL)
-MODEL_DIR = os.environ.get("PARATRAN_MODEL_DIR", None)
-ALLOWED_EXTENSIONS = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".webm"}
+from paratran.transcribe import ALLOWED_EXTENSIONS, get_model, transcribe_file
 
 app = FastAPI(title="Paratran", description="Audio transcription API powered by parakeet-mlx")
-model = None
 
 
 @app.on_event("startup")
 def load_model():
-    global model
-    kwargs = {}
-    if MODEL_DIR:
-        kwargs["cache_dir"] = MODEL_DIR
-    model = parakeet_mlx.from_pretrained(MODEL_NAME, **kwargs)
+    get_model()
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model": MODEL_NAME, "model_dir": MODEL_DIR}
+    from paratran.transcribe import _model_dir, _model_name
+    return {"status": "ok", "model": _model_name, "model_dir": _model_dir}
 
 
 @app.post("/transcribe")
@@ -71,58 +59,20 @@ async def transcribe(
         tmp.write(await file.read())
         tmp.close()
 
-        if decoding == "beam":
-            decoding_method = Beam(
-                beam_size=beam_size,
-                length_penalty=length_penalty,
-                patience=patience,
-                duration_reward=duration_reward,
-            )
-        else:
-            decoding_method = Greedy()
-
-        config = DecodingConfig(
-            decoding=decoding_method,
-            sentence=SentenceConfig(
-                max_words=max_words,
-                silence_gap=silence_gap,
-                max_duration=max_duration,
-            ),
-        )
-
-        dtype = mx.float32 if fp32 else mx.bfloat16
-
-        start = time.perf_counter()
-        result = model.transcribe(
+        return transcribe_file(
             tmp.name,
-            dtype=dtype,
-            decoding_config=config,
+            decoding=decoding,
+            beam_size=beam_size,
+            length_penalty=length_penalty,
+            patience=patience,
+            duration_reward=duration_reward,
+            max_words=max_words,
+            silence_gap=silence_gap,
+            max_duration=max_duration,
             chunk_duration=chunk_duration,
             overlap_duration=overlap_duration,
+            fp32=fp32,
         )
-        elapsed = time.perf_counter() - start
-
-        sentences = []
-        for seg in result.sentences:
-            tokens = [
-                {"text": t.text, "start": t.start, "end": t.end}
-                for t in seg.tokens
-            ]
-            sentences.append({
-                "text": seg.text,
-                "start": seg.start,
-                "end": seg.end,
-                "tokens": tokens,
-            })
-
-        duration = result.sentences[-1].end if result.sentences else 0.0
-
-        return {
-            "text": result.text,
-            "duration": duration,
-            "processing_time": round(elapsed, 3),
-            "sentences": sentences,
-        }
     finally:
         if tmp:
             Path(tmp.name).unlink(missing_ok=True)

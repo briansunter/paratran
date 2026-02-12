@@ -23,6 +23,7 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "python-multipart",
+    "mcp",
 ]
 
 [project.urls]
@@ -34,3 +35,4 @@ include = ["paratran*"]
 
 [project.scripts]
 paratran = "paratran.cli:main"
+paratran-mcp = "paratran.mcp_server:main"

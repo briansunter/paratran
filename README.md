@@ -1,6 +1,6 @@
 # Paratran
 
-REST API for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
+REST API and MCP server for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
 
 Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-audio/open_asr_leaderboard) and runs ~30x faster than Whisper on Apple Silicon via MLX.
 
@@ -112,6 +112,50 @@ curl -X POST http://localhost:8000/transcribe -F "file=@recording.m4a"
 ```
 
 Interactive API docs are available at `http://localhost:8000/docs`.
+
+## MCP Server
+
+Paratran includes an MCP server so Claude Code, Claude Desktop, or any MCP client can transcribe audio files directly.
+
+### Claude Code
+
+Add to `.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "paratran": {
+      "command": "uvx",
+      "args": ["paratran-mcp"],
+      "env": {
+        "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "paratran": {
+      "command": "uvx",
+      "args": ["paratran-mcp"],
+      "env": {
+        "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
+      }
+    }
+  }
+}
+```
+
+### MCP Tool
+
+The `transcribe` tool accepts a file path and all the same options as the REST API (decoding, beam search, sentence splitting, chunking, precision).
 
 ## License
 
