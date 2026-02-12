@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "paratran"
 version = "0.1.0"
@@ -5,6 +9,15 @@ description = "REST API for audio transcription using parakeet-mlx"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
+authors = [{ name = "Brian Sunter" }]
+keywords = ["transcription", "asr", "speech-to-text", "mlx", "apple-silicon"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
 dependencies = [
     "parakeet-mlx",
     "fastapi",
@@ -12,5 +25,9 @@ dependencies = [
     "python-multipart",
 ]
 
+[project.urls]
+Homepage = "https://github.com/briansunter/paratran"
+Repository = "https://github.com/briansunter/paratran"
+
 [project.scripts]
-paratran = "server:main"
+paratran = "paratran.cli:main"

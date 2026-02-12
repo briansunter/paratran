@@ -1,0 +1,12 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "python",
+      "package-name": "paratran",
+      "bump-minor-pre-major": true,
+      "extra-files": [
+        "paratran/__init__.py"
+      ]
+    }
+  }
+}

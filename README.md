@@ -13,7 +13,7 @@ Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-au
 ## Quick Start
 
 ```bash
-git clone https://github.com/bsunter/paratran.git
+git clone https://github.com/briansunter/paratran.git
 cd paratran
 ./run.sh
 ```

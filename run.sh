@@ -15,4 +15,4 @@ echo "Installing dependencies..."
 .venv/bin/pip install -e . --quiet
 
 echo "Starting server..."
-.venv/bin/python server.py "$@"
+.venv/bin/paratran "$@"
