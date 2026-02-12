@@ -1,27 +1,28 @@
 ---
 name: Paratran Transcription
-description: Transcribe audio files using the Paratran REST API server powered by parakeet-mlx on Apple Silicon. Use when transcribing audio, converting speech to text, getting word-level timestamps, or working with audio files (wav, mp3, flac, m4a, ogg, webm).
-keywords: [transcription, asr, speech-to-text, audio, mlx, apple-silicon, parakeet]
-topics: [audio-processing, machine-learning, rest-api]
+description: Transcribe audio files using Paratran CLI, REST API, or MCP server, powered by parakeet-mlx on Apple Silicon. Use when transcribing audio, converting speech to text, generating subtitles (SRT/VTT), getting word-level timestamps, or working with audio files (wav, mp3, flac, m4a, ogg, webm).
+keywords: [transcription, asr, speech-to-text, audio, mlx, apple-silicon, parakeet, subtitles, srt, vtt]
+topics: [audio-processing, machine-learning, rest-api, mcp]
 ---
 
 # Paratran Transcription
 
-Audio transcription REST API for Apple Silicon using parakeet-mlx. #1 on Open ASR Leaderboard, ~30x faster than Whisper.
+Audio transcription for Apple Silicon using parakeet-mlx. #1 on Open ASR Leaderboard, ~30x faster than Whisper via MLX.
+
+Three interfaces: CLI, REST API, and MCP server.
 
 ## Setup
 
 ### Quick run (no install)
 
 ```bash
-uvx paratran --model-dir /Volumes/Storage/models
+uvx paratran recording.wav
 ```
 
 ### Persistent install
 
 ```bash
 uv tool install paratran
-paratran --model-dir /Volumes/Storage/models
 ```
 
 ### From source
@@ -30,33 +31,69 @@ paratran --model-dir /Volumes/Storage/models
 git clone https://github.com/briansunter/paratran.git
 cd paratran
 uv sync
-uv run paratran
+uv run paratran recording.wav
 ```
 
-## CLI Options
-
-| Flag | Env Var | Default |
-|------|---------|---------|
-| `--model` | `PARATRAN_MODEL` | `mlx-community/parakeet-tdt-0.6b-v3` |
-| `--model-dir` | `PARATRAN_MODEL_DIR` | `~/.cache/huggingface` |
-| `--host` | | `0.0.0.0` |
-| `--port` | | `8000` |
-
-## API Endpoints
-
-### Health check
+## CLI Transcription
 
 ```bash
-curl http://localhost:8000/health
+# Transcribe to text (default)
+paratran recording.wav
+
+# Multiple files with verbose output
+paratran -v file1.wav file2.mp3 file3.m4a
+
+# Output as SRT subtitles
+paratran --output-format srt recording.wav
+
+# All formats (txt, json, srt, vtt) to a directory
+paratran --output-format all --output-dir ./output recording.wav
+
+# Beam search decoding
+paratran --decoding beam recording.wav
+
+# Custom model and cache directory
+paratran --model mlx-community/parakeet-tdt-1.1b-v2 --cache-dir /path/to/models recording.wav
 ```
 
-### Transcribe audio
+### CLI Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--model` | `mlx-community/parakeet-tdt-0.6b-v3` | HF model ID or local path |
+| `--cache-dir` | HuggingFace default | Model cache directory |
+| `--output-dir` | `.` | Output directory |
+| `--output-format` | `txt` | `txt`, `json`, `srt`, `vtt`, or `all` |
+| `--decoding` | `greedy` | `greedy` or `beam` |
+| `--chunk-duration` | `120` | Chunk duration in seconds (0 to disable) |
+| `--overlap-duration` | `15` | Overlap between chunks |
+| `--beam-size` | `5` | Beam size (beam decoding) |
+| `--fp32` | | Use FP32 precision instead of BF16 |
+| `-v` | | Verbose output |
+
+Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`.
+
+## REST API Server
+
+```bash
+# Start server
+paratran serve
+
+# Custom host, port, and model cache
+paratran serve --host 127.0.0.1 --port 9000 --cache-dir /path/to/models
+```
+
+### Transcribe via API
 
 ```bash
 curl -X POST http://localhost:8000/transcribe -F "file=@recording.m4a"
 ```
 
-Supported formats: wav, mp3, flac, m4a, ogg, webm.
+### Extract just text
+
+```bash
+curl -s -X POST http://localhost:8000/transcribe -F "file=@audio.m4a" | jq -r '.text'
+```
 
 ### Response format
 
@@ -79,32 +116,21 @@ Supported formats: wav, mp3, flac, m4a, ogg, webm.
 }
 ```
 
-## Common Tasks
+Interactive API docs at `http://localhost:8000/docs`.
 
-### Start server with custom model cache
+## MCP Server
 
-```bash
-paratran --model-dir /Volumes/Storage/models --port 8000
+For Claude Code, add to `.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "paratran": {
+      "command": "uvx",
+      "args": ["--from", "paratran", "paratran-mcp"]
+    }
+  }
+}
 ```
 
-### Transcribe and extract just text
-
-```bash
-curl -s -X POST http://localhost:8000/transcribe -F "file=@audio.m4a" | jq -r '.text'
-```
-
-### Transcribe and save full JSON output
-
-```bash
-curl -s -X POST http://localhost:8000/transcribe -F "file=@audio.m4a" | jq . > transcript.json
-```
-
-### Use a different model
-
-```bash
-paratran --model mlx-community/parakeet-tdt-1.1b-v2 --model-dir /Volumes/Storage/models
-```
-
-### Interactive API docs
-
-Open `http://localhost:8000/docs` in a browser for the Swagger UI.
+The MCP `transcribe` tool accepts a file path and all transcription options (decoding, beam search, sentence splitting, chunking, precision).

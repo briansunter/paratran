@@ -126,6 +126,22 @@ Upload an audio file (wav, mp3, flac, m4a, ogg, webm):
 curl -X POST http://localhost:8000/transcribe -F "file=@recording.m4a"
 ```
 
+Optional query parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `decoding` | `greedy` | `greedy` or `beam` |
+| `beam_size` | `5` | Beam size (beam decoding) |
+| `length_penalty` | `1.0` | Length penalty (beam decoding) |
+| `patience` | `1.0` | Patience (beam decoding) |
+| `duration_reward` | `0.7` | Duration reward (beam decoding) |
+| `max_words` | | Max words per sentence |
+| `silence_gap` | | Split at silence gaps (seconds) |
+| `max_duration` | | Max sentence duration (seconds) |
+| `chunk_duration` | | Chunk duration for long audio (seconds) |
+| `overlap_duration` | `15.0` | Overlap between chunks (seconds) |
+| `fp32` | `false` | Use FP32 instead of BF16 |
+
 ```json
 {
   "text": "Hello world, this is a test.",
@@ -160,10 +176,7 @@ Add to `.claude/settings.json`:
   "mcpServers": {
     "paratran": {
       "command": "uvx",
-      "args": ["--from", "paratran", "paratran-mcp"],
-      "env": {
-        "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
-      }
+      "args": ["--from", "paratran", "paratran-mcp"]
     }
   }
 }
@@ -178,14 +191,13 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "paratran": {
       "command": "uvx",
-      "args": ["--from", "paratran", "paratran-mcp"],
-      "env": {
-        "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
-      }
+      "args": ["--from", "paratran", "paratran-mcp"]
     }
   }
 }
 ```
+
+Optionally set `PARATRAN_MODEL_DIR` in the `env` block to customize the model cache location.
 
 ### MCP Tool
 
