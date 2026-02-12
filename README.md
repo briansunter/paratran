@@ -126,7 +126,7 @@ Add to `.claude/settings.json`:
   "mcpServers": {
     "paratran": {
       "command": "uvx",
-      "args": ["paratran-mcp"],
+      "args": ["--from", "paratran", "paratran-mcp"],
       "env": {
         "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
       }
@@ -144,7 +144,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "paratran": {
       "command": "uvx",
-      "args": ["paratran-mcp"],
+      "args": ["--from", "paratran", "paratran-mcp"],
       "env": {
         "PARATRAN_MODEL_DIR": "/Volumes/Storage/models"
       }
