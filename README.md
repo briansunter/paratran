@@ -12,28 +12,35 @@ Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-au
 
 ## Quick Start
 
+Run without installing:
+
 ```bash
-git clone https://github.com/briansunter/paratran.git
-cd paratran
-./run.sh
+uvx paratran
 ```
 
-This creates a virtual environment, installs dependencies, downloads the model, and starts the server at `http://localhost:8000`.
-
 ## Install
+
+### uv (recommended)
+
+```bash
+uv tool install paratran
+paratran
+```
+
+### pip
 
 ```bash
 pip install paratran
 paratran
 ```
 
-Or from source:
+### From source
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-paratran
+git clone https://github.com/briansunter/paratran.git
+cd paratran
+uv sync
+uv run paratran
 ```
 
 ## Usage

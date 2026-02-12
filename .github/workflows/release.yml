@@ -27,19 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
 
-      - name: Build package
-        run: |
-          pip install build
-          python -m build
-
-      - name: Publish to PyPI
+      - name: Build and publish to PyPI
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_KEY }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_KEY }}
         run: |
-          pip install twine
-          twine upload dist/*
+          uv build --no-sources
+          uv publish
