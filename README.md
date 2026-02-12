@@ -165,9 +165,9 @@ Interactive API docs are available at `http://localhost:8000/docs`.
 
 ## MCP Server
 
-Paratran includes an MCP server so Claude Code, Claude Desktop, or any MCP client can transcribe audio files directly.
+Paratran includes an MCP server so Claude Code, Claude Desktop, or any MCP client can transcribe audio files directly. Supports both stdio and streamable HTTP transports.
 
-### Claude Code
+### Claude Code (stdio)
 
 Add to `.claude/settings.json`:
 
@@ -182,7 +182,7 @@ Add to `.claude/settings.json`:
 }
 ```
 
-### Claude Desktop
+### Claude Desktop (stdio)
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -198,6 +198,16 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```
 
 Optionally set `PARATRAN_MODEL_DIR` in the `env` block to customize the model cache location.
+
+### Streamable HTTP
+
+Run the MCP server over HTTP for remote or multi-client access:
+
+```bash
+paratran-mcp --transport streamable-http --host 0.0.0.0 --port 8000
+```
+
+The MCP endpoint is available at `http://localhost:8000/mcp`.
 
 ### MCP Tool
 
