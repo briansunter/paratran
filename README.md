@@ -2,7 +2,7 @@
 
 CLI, REST API, and MCP server for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
 
-Parakeet achieves 6.05% average WER ([model card](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2)) and runs ~30x faster than Whisper on Apple Silicon via MLX.
+The default model ([parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)) achieves 6.34% average WER across 8 English benchmarks and supports 25 languages. Runs ~30x faster than Whisper on Apple Silicon via MLX.
 
 ## Requirements
 
