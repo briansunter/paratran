@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/briansunter/paratran/compare/v0.2.0...v0.2.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* exclude skills/ from package build ([c594932](https://github.com/briansunter/paratran/commit/c594932983d9c35d8a15dff0c84455427ce7aa0d))
+
 ## [0.2.0](https://github.com/briansunter/paratran/compare/v0.1.0...v0.2.0) (2026-02-12)
 
 
