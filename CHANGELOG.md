@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/briansunter/paratran/compare/v0.3.0...v0.4.0) (2026-02-12)
+
+
+### Features
+
+* rewrite CLI to match parakeet-mlx format ([9f49259](https://github.com/briansunter/paratran/commit/9f4925951943dadb37c21ac0d3352623b2180819))
+
+
+### Bug Fixes
+
+* use --from paratran for uvx mcp command in README ([043a471](https://github.com/briansunter/paratran/commit/043a471b50ab4ef5d2a149d1b513258c9340b176))
+
 ## [0.3.0](https://github.com/briansunter/paratran/compare/v0.2.1...v0.3.0) (2026-02-12)
 
 
