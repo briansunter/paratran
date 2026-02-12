@@ -1,0 +1,16 @@
+[project]
+name = "paratran"
+version = "0.1.0"
+description = "REST API for audio transcription using parakeet-mlx"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "parakeet-mlx",
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+]
+
+[project.scripts]
+paratran = "server:main"
