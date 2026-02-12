@@ -1,6 +1,6 @@
 # Paratran
 
-REST API and MCP server for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
+CLI, REST API, and MCP server for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
 
 Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-audio/open_asr_leaderboard) and runs ~30x faster than Whisper on Apple Silicon via MLX.
 
@@ -12,10 +12,16 @@ Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-au
 
 ## Quick Start
 
-Run without installing:
+Transcribe audio files directly:
 
 ```bash
-uvx paratran
+uvx paratran recording.wav
+```
+
+Or start the REST API server:
+
+```bash
+uvx paratran serve
 ```
 
 ## Install
@@ -24,14 +30,12 @@ uvx paratran
 
 ```bash
 uv tool install paratran
-paratran
 ```
 
 ### pip
 
 ```bash
 pip install paratran
-paratran
 ```
 
 ### From source
@@ -43,30 +47,60 @@ uv sync
 uv run paratran
 ```
 
-## Usage
+## CLI Usage
 
 ```bash
-# Default settings
-paratran
+# Transcribe a single file
+paratran recording.wav
 
-# Custom model cache location
-paratran --model-dir /Volumes/Storage/models
+# Transcribe multiple files with verbose output
+paratran -v file1.wav file2.mp3 file3.m4a
 
-# Custom host and port
-paratran --host 127.0.0.1 --port 9000
+# Output as SRT subtitles
+paratran --output-format srt recording.wav
 
-# Different model
-paratran --model mlx-community/parakeet-tdt-1.1b-v2
+# Output all formats (txt, json, srt, vtt)
+paratran --output-format all --output-dir ./output recording.wav
+
+# Use beam search decoding
+paratran --decoding beam recording.wav
+
+# Custom model and cache directory
+paratran --model mlx-community/parakeet-tdt-1.1b-v2 --cache-dir /Volumes/Storage/models recording.wav
 ```
 
-All options can also be set via environment variables:
+### CLI Options
 
-| CLI Flag       | Env Var              | Default                                  |
-|----------------|----------------------|------------------------------------------|
-| `--model`      | `PARATRAN_MODEL`     | `mlx-community/parakeet-tdt-0.6b-v3`    |
-| `--model-dir`  | `PARATRAN_MODEL_DIR` | HuggingFace default (`~/.cache/huggingface`) |
-| `--host`       |                      | `0.0.0.0`                                |
-| `--port`       |                      | `8000`                                   |
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--model` | `mlx-community/parakeet-tdt-0.6b-v3` | HF model ID or local path |
+| `--cache-dir` | HuggingFace default | Model cache directory |
+| `--output-dir` | `.` | Output directory |
+| `--output-format` | `txt` | `txt`, `json`, `srt`, `vtt`, or `all` |
+| `--decoding` | `greedy` | `greedy` or `beam` |
+| `--chunk-duration` | `120` | Chunk duration in seconds (0 to disable) |
+| `--overlap-duration` | `15` | Overlap between chunks |
+| `--beam-size` | `5` | Beam size (beam decoding) |
+| `--length-penalty` | `0.013` | Length penalty (beam decoding) |
+| `--patience` | `3.5` | Patience (beam decoding) |
+| `--duration-reward` | `0.67` | Duration reward (beam decoding) |
+| `--max-words` | | Max words per sentence |
+| `--silence-gap` | | Split at silence gaps (seconds) |
+| `--max-duration` | | Max sentence duration (seconds) |
+| `--fp32` | | Use FP32 precision instead of BF16 |
+| `-v` | | Verbose output |
+
+Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`.
+
+## REST API Server
+
+```bash
+# Start server with default settings
+paratran serve
+
+# Custom host, port, and model cache
+paratran serve --host 127.0.0.1 --port 9000 --cache-dir /Volumes/Storage/models
+```
 
 ## API
 
