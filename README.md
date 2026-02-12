@@ -23,14 +23,16 @@ This creates a virtual environment, installs dependencies, downloads the model, 
 ## Install
 
 ```bash
+pip install paratran
+paratran
+```
+
+Or from source:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-```
-
-Then run:
-
-```bash
 paratran
 ```
 
