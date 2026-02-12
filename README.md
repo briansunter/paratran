@@ -2,7 +2,7 @@
 
 CLI, REST API, and MCP server for audio transcription on Apple Silicon, powered by [parakeet-mlx](https://github.com/senstella/parakeet-mlx).
 
-Parakeet is #1 on the [Open ASR Leaderboard](https://huggingface.co/spaces/hf-audio/open_asr_leaderboard) and runs ~30x faster than Whisper on Apple Silicon via MLX.
+Parakeet achieves 6.05% average WER ([model card](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2)) and runs ~30x faster than Whisper on Apple Silicon via MLX.
 
 ## Requirements
 

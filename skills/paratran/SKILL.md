@@ -7,7 +7,7 @@ topics: [audio-processing, machine-learning, rest-api, mcp]
 
 # Paratran Transcription
 
-Audio transcription for Apple Silicon using parakeet-mlx. #1 on Open ASR Leaderboard, ~30x faster than Whisper via MLX.
+Audio transcription for Apple Silicon using parakeet-mlx. Achieves 6.05% average WER, ~30x faster than Whisper via MLX.
 
 Three interfaces: CLI, REST API, and MCP server.
 
