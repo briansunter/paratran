@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.0](https://github.com/briansunter/paratran/compare/v0.1.0...v0.2.0) (2026-02-12)
+
+
+### Features
+
+* add Claude skill for paratran setup and usage ([fc0e320](https://github.com/briansunter/paratran/commit/fc0e3208c802d9d82ea600c2458eecb8c75cd531))
+* expose all parakeet-mlx transcription options ([11e3c8d](https://github.com/briansunter/paratran/commit/11e3c8dcb5ae08ca1a2a337cd6b9a5c61aeba939))
+* remove run.sh in favor of uvx ([232ee6a](https://github.com/briansunter/paratran/commit/232ee6a56d6f84c87a2d5527fac5d1f490941822))
+* use uv for build, publish, and install ([61d1e23](https://github.com/briansunter/paratran/commit/61d1e23933272913a5cf9a3806d6cac31fbe1b38))
+
 ## 0.1.0 (2026-02-12)
 
 
