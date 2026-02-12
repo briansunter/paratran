@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/briansunter/paratran/compare/v0.4.0...v0.5.0) (2026-02-12)
+
+
+### Features
+
+* add client mode to CLI for connecting to a running server ([d6d3418](https://github.com/briansunter/paratran/commit/d6d341807efd0c942ed810b450959842ffb47d2b))
+* add streamable HTTP transport to MCP server ([077a51c](https://github.com/briansunter/paratran/commit/077a51ce93888fb8a310c1a96ff3388d1a1b159d))
+
+
+### Documentation
+
+* expand skill with full REST API params and MCP setup details ([da5a3c2](https://github.com/briansunter/paratran/commit/da5a3c291fd307df7f899850bd84656d9d5f3ed0))
+* fix WER figure to match actual default model (v3, not v2) ([7a8cc43](https://github.com/briansunter/paratran/commit/7a8cc437be2b78ced3eaa6cf01688c8fbb0626c4))
+* replace [#1](https://github.com/briansunter/paratran/issues/1) leaderboard claim with actual WER figure ([f1b763f](https://github.com/briansunter/paratran/commit/f1b763fa6bf0ff8d022d45cb1cd8ea233a244abc))
+* update README and skill to reflect current CLI, API, and MCP ([0c0fcbe](https://github.com/briansunter/paratran/commit/0c0fcbed7b1cc478dc4efabee0bc5d92774a9df2))
+
 ## [0.4.0](https://github.com/briansunter/paratran/compare/v0.3.0...v0.4.0) (2026-02-12)
 
 
