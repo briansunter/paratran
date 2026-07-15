@@ -12,6 +12,13 @@
 * fix CLI HTTP error classification, invalid output formats, per-file failures, and exit codes
 * report input duration when ffprobe is available and preserve processing metadata
 
+## [0.6.0](https://github.com/briansunter/paratran/compare/v0.5.0...v0.6.0) (2026-07-15)
+
+
+### Features
+
+* harden transcription interfaces ([#7](https://github.com/briansunter/paratran/issues/7)) ([16fab44](https://github.com/briansunter/paratran/commit/16fab44b6b6e8f83ca85292c97ef4b8d30f6d039))
+
 ## [0.5.0](https://github.com/briansunter/paratran/compare/v0.4.0...v0.5.0) (2026-02-12)
 
 
