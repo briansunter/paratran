@@ -1027,7 +1027,7 @@ wheels = [
 
 [[package]]
 name = "paratran"
-version = "0.5.0"
+version = "0.6.0" # x-release-please-version
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
