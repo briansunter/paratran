@@ -81,7 +81,7 @@ paratran serve
 # Transcribe via the server
 paratran -s http://localhost:8000 recording.wav
 
-# All the same options work
+# Output and transcription options work in client mode
 paratran -s http://localhost:8000 --output-format all --output-dir ./output -v recording.wav
 
 # Set the server URL via environment variable
@@ -94,6 +94,8 @@ paratran recording.wav  # automatically uses the server
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-s`, `--server` | | URL of a running paratran server |
+| `--api-key` | | Bearer token for an authenticated server |
+| `--timeout` | `60` | Server request timeout in seconds |
 | `--model` | `mlx-community/parakeet-tdt-0.6b-v3` | HF model ID or local path |
 | `--cache-dir` | HuggingFace default | Model cache directory |
 | `--output-dir` | `.` | Output directory |
@@ -111,19 +113,28 @@ paratran recording.wav  # automatically uses the server
 | `--fp32` | | Use FP32 precision instead of BF16 |
 | `-v` | | Verbose output |
 
-Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`, `PARATRAN_SERVER`.
+Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`, `PARATRAN_SERVER`, `PARATRAN_API_KEY`.
+
+When using client mode, configure `--model` and `--cache-dir` on the running server; those options do not change a remote server.
 
 ## REST API Server
 
 ```bash
-# Start server with default settings
+# Start server with local-only defaults
 paratran serve
 
 # Custom host, port, and model cache
 paratran serve --host 127.0.0.1 --port 9000 --cache-dir /Volumes/Storage/models
+
+# Expose the server only with an API key
+paratran serve --host 0.0.0.0 --api-key "$PARATRAN_API_KEY"
 ```
 
+The server defaults to `127.0.0.1`, limits uploads to 512 MB, and processes one transcription at a time. Non-loopback hosts require `--api-key`.
+
 ## API
+
+The REST API is compatible with the [OpenAI Audio Transcription API](https://platform.openai.com/docs/api-reference/audio/createTranscription).
 
 ### `GET /health`
 
@@ -139,48 +150,68 @@ curl http://localhost:8000/health
 }
 ```
 
-### `POST /transcribe`
+### `POST /v1/audio/transcriptions`
 
 Upload an audio file (wav, mp3, flac, m4a, ogg, webm):
 
 ```bash
-curl -X POST http://localhost:8000/transcribe -F "file=@recording.m4a"
+curl http://localhost:8000/v1/audio/transcriptions \
+  -F "file=@recording.m4a" \
+  -F "model=parakeet"
 ```
 
-Optional query parameters:
+#### OpenAI-compatible parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `file` | *(required)* | Audio file to transcribe |
+| `model` | | Accepted for compatibility; uses the configured model |
+| `response_format` | `json` | `json`, `text`, `srt`, `vtt`, or `verbose_json` |
+| `language` | | Accepted for compatibility; language is auto-detected |
+| `prompt` | | Accepted for compatibility; prompts are not applied |
+| `temperature` | | Accepted for compatibility; temperature is not applied |
+
+#### Paratran-specific parameters
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `decoding` | `greedy` | `greedy` or `beam` |
 | `beam_size` | `5` | Beam size (beam decoding) |
-| `length_penalty` | `1.0` | Length penalty (beam decoding) |
-| `patience` | `1.0` | Patience (beam decoding) |
-| `duration_reward` | `0.7` | Duration reward (beam decoding) |
+| `length_penalty` | `0.013` | Length penalty (beam decoding) |
+| `patience` | `3.5` | Patience (beam decoding) |
+| `duration_reward` | `0.67` | Duration reward (beam decoding) |
 | `max_words` | | Max words per sentence |
 | `silence_gap` | | Split at silence gaps (seconds) |
 | `max_duration` | | Max sentence duration (seconds) |
-| `chunk_duration` | | Chunk duration for long audio (seconds) |
+| `chunk_duration` | `120` | Chunk duration for long audio (seconds); `0` disables chunking |
 | `overlap_duration` | `15.0` | Overlap between chunks (seconds) |
 | `fp32` | `false` | Use FP32 instead of BF16 |
 
+#### Response formats
+
+**`json`** (default):
+```json
+{"text": "Hello world, this is a test."}
+```
+
+**`verbose_json`** (also includes `processing_time`):
 ```json
 {
-  "text": "Hello world, this is a test.",
+  "task": "transcribe",
   "duration": 3.52,
   "processing_time": 0.176,
-  "sentences": [
-    {
-      "text": "Hello world, this is a test.",
-      "start": 0.0,
-      "end": 3.52,
-      "tokens": [
-        { "text": "Hello", "start": 0.0, "end": 0.48 },
-        { "text": " world", "start": 0.48, "end": 0.8 }
-      ]
-    }
+  "text": "Hello world, this is a test.",
+  "segments": [
+    {"id": 0, "start": 0.0, "end": 3.52, "text": "Hello world, this is a test."}
+  ],
+  "words": [
+    {"word": "Hello", "start": 0.0, "end": 0.48},
+    {"word": " world", "start": 0.48, "end": 0.8}
   ]
 }
 ```
+
+**`text`**: Returns plain text. **`srt`** / **`vtt`**: Returns subtitles.
 
 Interactive API docs are available at `http://localhost:8000/docs`.
 
@@ -222,17 +253,17 @@ Optionally set `PARATRAN_MODEL_DIR` in the `env` block to customize the model ca
 
 ### Streamable HTTP
 
-Run the MCP server over HTTP for remote or multi-client access:
+Run the MCP server over HTTP for local or multi-client access:
 
 ```bash
-paratran-mcp --transport streamable-http --host 0.0.0.0 --port 8000
+paratran-mcp --transport streamable-http --host 127.0.0.1 --port 8000
 ```
 
-The MCP endpoint is available at `http://localhost:8000/mcp`.
+The MCP endpoint is available at `http://localhost:8000/mcp`. For HTTP MCP on a non-loopback host, pass both `--allowed-root` and `--api-key`; the key is accepted as an `Authorization: Bearer` token. Loopback HTTP can also be protected with `--api-key` when multiple local clients share the server.
 
 ### MCP Tool
 
-The `transcribe` tool accepts a file path and all the same options as the REST API (decoding, beam search, sentence splitting, chunking, precision).
+The `transcribe` tool accepts an absolute file path and all the same transcription options as the REST interface. `--allowed-root` restricts paths to a directory, which is recommended for HTTP MCP.
 
 ## License
 

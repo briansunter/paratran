@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* unify transcription options and result serialization across CLI, REST, and MCP
+* add bounded uploads, API-key protection, safe local defaults, and MCP path restrictions
+
+### Bug Fixes
+
+* fix CLI HTTP error classification, invalid output formats, per-file failures, and exit codes
+* report input duration when ffprobe is available and preserve processing metadata
+
 ## [0.5.0](https://github.com/briansunter/paratran/compare/v0.4.0...v0.5.0) (2026-02-12)
 
 

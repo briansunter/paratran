@@ -58,19 +58,11 @@ paratran --model mlx-community/parakeet-tdt-1.1b-v2 --cache-dir /path/to/models 
 
 ### Client Mode
 
-Use `--server` / `-s` to send files to a running server instead of transcribing locally. Avoids model loading on every call.
+Use `--server` / `-s` to send files to a running server instead of transcribing locally.
 
 ```bash
-# Start server once
 paratran serve
-
-# Transcribe via server (instant, no model loading)
 paratran -s http://localhost:8000 recording.wav
-
-# Output and transcription options work in client mode
-paratran -s http://localhost:8000 --output-format all --output-dir ./output -v recording.wav
-
-# Or set via environment variable
 export PARATRAN_SERVER=http://localhost:8000
 paratran recording.wav
 ```
@@ -93,12 +85,10 @@ paratran recording.wav
 
 Environment variables: `PARATRAN_MODEL`, `PARATRAN_MODEL_DIR`, `PARATRAN_SERVER`, `PARATRAN_API_KEY`.
 
-When using client mode, configure `--model` and `--cache-dir` on the running server; those options do not change a remote server.
-
 ## REST API Server
 
 ```bash
-# Start server locally
+# Start server
 paratran serve
 
 # Custom host, port, and model cache
@@ -127,7 +117,7 @@ curl -s http://localhost:8000/v1/audio/transcriptions -F "file=@audio.m4a" | jq 
 curl http://localhost:8000/v1/audio/transcriptions -F "file=@recording.m4a" -F "response_format=verbose_json"
 ```
 
-OpenAI-compatible form parameters: `model`, `response_format` (`json`, `text`, `srt`, `vtt`, `verbose_json`), `language`, `prompt`, `temperature`. The compatibility-only `model`, `language`, `prompt`, and `temperature` fields are accepted but currently ignored.
+OpenAI-compatible form parameters: `model`, `response_format` (`json`, `text`, `srt`, `vtt`, `verbose_json`), `language`, `prompt`, `temperature`.
 
 Paratran-specific form parameters: `decoding`, `beam_size`, `length_penalty`, `patience`, `duration_reward`, `max_words`, `silence_gap`, `max_duration`, `chunk_duration`, `overlap_duration`, `fp32`.
 
@@ -159,9 +149,9 @@ Interactive API docs at `http://localhost:8000/docs`.
 
 ## MCP Server
 
-Supports stdio (for Claude Code/Desktop) and streamable HTTP (for local or multi-client access).
+Paratran includes an MCP server so Claude Code, Claude Desktop, or any MCP client can transcribe audio files directly.
 
-### Claude Code (stdio)
+### Claude Code
 
 Add to `.claude/settings.json`:
 
@@ -176,7 +166,7 @@ Add to `.claude/settings.json`:
 }
 ```
 
-### Claude Desktop (stdio)
+### Claude Desktop
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -199,7 +189,7 @@ Optionally set `PARATRAN_MODEL_DIR` in the `env` block to customize the model ca
 paratran-mcp --transport streamable-http --host 127.0.0.1 --port 8000
 ```
 
-MCP endpoint at `http://localhost:8000/mcp`. For non-loopback HTTP MCP, pass both `--allowed-root` and `--api-key`; the key is accepted as an `Authorization: Bearer` token. Loopback HTTP can also be protected with `--api-key` for shared local use.
+For non-loopback HTTP MCP, pass both `--allowed-root` and `--api-key`; the key is accepted as an `Authorization: Bearer` token. Loopback HTTP can also be protected with `--api-key` for shared local use.
 
 ### MCP Tool
 
